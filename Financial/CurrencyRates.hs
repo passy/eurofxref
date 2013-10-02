@@ -1,8 +1,8 @@
 module Financial.CurrencyRates where
 
-import Data.Map (Map)
-import qualified Data.Map as M
-import Data.Time.Clock
+import           Data.Map  (Map)
+import qualified Data.Map  as M
+import           Data.Time
 
 -- | A standard three-letter currency name.
 newtype Currency = Currency String deriving (Eq, Show, Read, Ord)
@@ -12,7 +12,7 @@ data Rates a = Rates {
         raReference :: Currency,  -- ^ The reference currency
         raTime      :: UTCTime,   -- ^ The time when the rates were valid
         raRates     :: Map Currency a  -- ^ Value of one unit of the reference currency in each currency
-    }
+    } deriving (Show)
 
 -- | Re-base the rates to a different reference currency, such that the new rates give
 -- the value of one unit of that currency.
