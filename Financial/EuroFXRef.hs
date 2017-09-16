@@ -23,12 +23,13 @@ module Financial.EuroFXRef (
 import Financial.CurrencyRates
 
 import Control.Applicative
+import Control.Monad.Catch
 import Control.Arrow (second, first)
 import Control.Exception
 import Control.Failure
 import Control.Monad.State.Strict
 import Control.Monad.Trans.Control
-import Data.Conduit (MonadResource, runResourceT, ResourceT)
+import Control.Monad.Trans.Resource (MonadResource, runResourceT, ResourceT)
 import qualified Data.Map as M
 import Data.Time.Calendar
 import Data.Time.Clock
@@ -90,7 +91,7 @@ parseEuropeanCentralBank (Element _ _ chs) =
 parseEuropeanCentralBank _ = Left "element expected at top level"
 
 -- | The URL for the European Central Bank's free daily reference rates.
-europeanCentralBankDaily :: Failure HttpException m => m (HTTP.Request m')
+europeanCentralBankDaily :: MonadThrow m => m HTTP.Request
 europeanCentralBankDaily = parseUrl "http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml"
 
 -- | Fetch today's currency rates from the specified URL.
@@ -99,7 +100,7 @@ europeanCentralBankDaily = parseUrl "http://www.ecb.int/stats/eurofxref/eurofxre
 -- or 'IOException' for network-level failures.
 fetchFrom :: (Failure EuropeanCentralBankException m, Failure HttpException m,
               MonadResource m, MonadBaseControl IO m, Read a) =>
-             HTTP.Request m
+             HTTP.Request
           -> HTTP.Manager
           -> m (Rates a)
 fetchFrom req mgr = do
@@ -121,7 +122,7 @@ fetchFrom req mgr = do
 -- Throws a 'EuropeanCentralBankException' for failures at HTTP and above,
 -- or 'IOException' for network-level failures.
 fetch :: (Failure EuropeanCentralBankException m, Failure HttpException m,
-          MonadIO m, Read a) =>
+          MonadThrow m, MonadIO m, Read a) =>
          m (Rates a)
 fetch = do
     req <- europeanCentralBankDaily

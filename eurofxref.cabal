@@ -35,7 +35,9 @@ Library
         http-types >= 0.6,
         hexpat >= 0.20,
         mtl >= 2,
-        time >= 1.2
+        time >= 1.2,
+        resourcet >= 1.0,
+        exceptions >= 0.8
     exposed-modules: Financial.CurrencyRates, Financial.EuroFXRef
     exposed: True
     buildable: True
